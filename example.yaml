@@ -1,0 +1,50 @@
+---
+# These are apps that need to be running for the app to work normally in
+# development mode.
+#
+# These will be the default dependencies for all modes, but you can override
+# them for individual modes by specifying `depends_on`.
+# 
+# The key is the name of the application, and the value is the mode it should
+# run in.
+#
+# We're actually just using YAML reference/anchor syntax to insert this block
+# into the `modes` object below. It has no special meaning to the program, so we
+# can use as many or as few of these as we need.
+#
+dependencies: &default_dependencies
+  imagehaus: dependency
+  renderraum: static
+
+# The different modes in which your app can run (on a dev or test machine).
+# `development` and `dependency` have sensible defaults, but you should adjust
+# them so that they fit your most common dev use cases for making changes and
+# running as a dependency, respectively.
+#
+# You may add custom modes for additional use cases, for example to include or
+# exclude background workers, or to use placeholder data instead of some
+# dependency.
+#
+modes:
+  development:
+    command: ["make", "local"]
+    dependencies: *default_dependencies
+  dependency:
+    command: ["./dev/up.sh"]
+    dependencies: *default_dependencies
+  no-renderraum:
+    command: ["make", "local"]
+    env:
+      # Use an env var to tell the app what's going on. This is an arbitrary example.
+      USE_RENDERRAUM: false
+    # This app uses a non-default set of dependencies, in this case a subset.
+    dependencies:
+      imagehaus: dependency
+  extra-dependencies:
+    command: ["make", "local"]
+    # This app takes the default list and extends it.
+    dependencies:
+      <<: *default_dependencies
+      extra-raum: dependency
+      # We can override existing settings, too:
+      imagehaus: development
