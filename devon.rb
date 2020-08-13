@@ -1,13 +1,5 @@
 #!/usr/bin/env ruby
 
-## TODO: Figure out how to make this work regardless of the "current" version of
-## Ruby according to rbenv, chruby or whatever. Options include:
-#
-# * Shebanging the system ruby directly
-# * Writing ridiculously compatible code
-# * Using another language, preferably a compiled one
-#
-
 require 'optparse'
 require 'yaml'
 
@@ -31,41 +23,14 @@ OptionParser.new do |opts|
 end.parse!
 
 class AppStarter
-  # TODO: Maybe a `stop` method is a good idea?
-  #
-  # But how do we make it work with dependencies? Do we just stop everything?
-  # And if not, how do we decide what to stop, and what not to?
-  # How do we even know what's been started with devon?
-  #
-  # AAAAAAAAAAAARGH!!! :(
-  #
-
   def start(app, options)
     mode = options[:mode]
-
-    # TODO: Do we want to ensure this app is up-to-date?
-    #
-    # * Clone it if absent?
-    # * Pull it?
-    # * Pull it if on master?
-    # * Depends on the mode (e.g. not in development, yes in dependency?)
-    # * Let the mode config specify?
-    #
 
     config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
     config =
       begin
         YAML.load(File.read(config_path))
       rescue Errno::ENOENT
-        # TODO: Decide what to do when we can't find a config file.
-        #
-        # Options:
-        #
-        # * Leave it and move on (current)
-        # * Stop everything
-        # * Just exit (e.g. by raising an unhandled error)
-        # * Take some sensible default action (e.g. run ./dev/up.sh if in dependency mode)
-        #
         puts "Oh noes! It looks like #{app} doesn't have a #{CONFIG_FILE_NAME}, so devon can't start it :("
         return
       end

@@ -52,3 +52,7 @@ Runs the application, but doesn't pay attention to code changes. Usually, this w
 ### Custom modes
 
 Each application can specify custom modes, to enable or disable specific functions. For example, an application with both a synchronous frontend and an async backend worker might have the worker disabled by default, and use a custom mode to enable it, or to run it in isolation.
+
+## Development
+
+**[Trello board](https://trello.com/b/MsxE9Nw6/devon-the-dev-application-starter)**
