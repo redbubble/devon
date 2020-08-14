@@ -35,19 +35,27 @@ class Options
 end
 
 class AppStarter
+
+  class CouldNotReadConfigException < StandardError
+    def initialize(app)
+      @app = app
+      msg = "Aw, shoot! It seems as though #{app} has a problem with the YAML syntax in its #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :("
+      super(msg)
+    end
+  end
+
+  class NoConfigFileException < StandardError
+    def initialize(app)
+      @app = app
+      msg = "Oh noes! It looks like #{app} doesn't have a #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :("
+      super(msg)
+    end
+  end
+
   SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
   CONFIG_FILE_NAME = 'devon.conf.yaml'
 
   def start(app, mode)
-
-    config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
-    config =
-      begin
-        YAML.load(File.read(config_path))
-      rescue Errno::ENOENT
-        puts "Oh noes! It looks like #{app} doesn't have a #{CONFIG_FILE_NAME}, so devon can't start it :("
-        return
-      end
 
     puts "Starting #{app} in #{mode} mode..."
 
@@ -78,6 +86,20 @@ class AppStarter
     end
 
     system("cd #{File.join(SOURCE_CODE_BASE, app)}; #{command}")
+  end
+
+  def config
+    return @config if @config
+
+    config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
+    @config =
+      begin
+        YAML.load(File.read(config_path))
+      rescue Errno::ENOENT
+        raise NoConfigFileException.new(app)
+      rescue Psych::SyntaxError
+        raise CouldNotReadConfigException.new(app)
+      end
   end
 end
 
