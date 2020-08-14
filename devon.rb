@@ -3,9 +3,6 @@
 require 'optparse'
 require 'yaml'
 
-SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
-CONFIG_FILE_NAME = 'devon.conf.yaml'
-
 class Options
   @options = {
     mode: 'dependency'
@@ -38,6 +35,9 @@ class Options
 end
 
 class AppStarter
+  SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
+  CONFIG_FILE_NAME = 'devon.conf.yaml'
+
   def start(app, mode)
 
     config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
