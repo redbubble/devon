@@ -52,6 +52,15 @@ class App
     end
   end
 
+  class ModeDoesNotExistException < StandardError
+    def initialize(app, mode)
+      @app = app
+      @mode = mode
+      msg = "Gadzooks! It appears that #{app} doesn't have a mode called '#{mode}', so devon can't start it :("
+      super(msg)
+    end
+  end
+
   SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
   CONFIG_FILE_NAME = 'devon.conf.yaml'
 
@@ -68,7 +77,6 @@ class App
       puts config
     end
 
-    raise "Could not find a mode named '#{mode}' for application '#{name}'." unless config['modes'].has_key?(mode)
 
     # Is it a bird?
     # Is it a plane?
@@ -81,9 +89,6 @@ class App
     end
 
     # Finally, actually start the thing
-    # This is naive af, but it should be OK for a PoC...
-    command = mode_config['command'].join(" ")
-
     if Options.verbose?
       puts "Running command: '#{command}'"
     end
@@ -91,7 +96,16 @@ class App
     system("cd #{File.join(SOURCE_CODE_BASE, name)}; #{command}")
   end
 
+  # This is naive af, but it should be OK for a PoC...
+  def command
+    mode_config['command'].join(" ")
+  end
+
   def mode_config
+    unless config['modes'].has_key?(mode)
+      raise ModeDoesNotExistException.new(name, mode)
+    end
+
     config['modes'][mode]
   end
 
