@@ -6,21 +6,36 @@ require 'yaml'
 SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
 CONFIG_FILE_NAME = 'devon.conf.yaml'
 
-# Initialise with some default values
-@options = {
-  mode: 'dependency'
-}
+class Options
+  @options = {
+    mode: 'dependency'
+  }
 
-# Parse the command line arguments
-OptionParser.new do |opts|
-  opts.on('-m', '--mode MODE', "The mode to run in, e.g. 'development' or 'dependency'") do |mode|
-    @options[:mode] = mode
+  def self.parse!
+    # Parse the command line arguments
+    OptionParser.new do |opts|
+      opts.on('-m', '--mode MODE', "The mode to run in, e.g. 'development' or 'dependency'") do |mode|
+        @options[:mode] = mode
+      end
+
+      opts.on('-v', '--verbose', "Print all the informations!") do
+        @options[:verbose] = true
+      end
+    end.parse!
   end
 
-  opts.on('-v', '--verbose', "Print all the informations!") do
-    @options[:verbose] = true
+  def self.all
+    @options
   end
-end.parse!
+
+  def self.mode
+    @options[:mode]
+  end
+
+  def self.verbose?
+    @options[:verbose]
+  end
+end
 
 class AppStarter
   def start(app, options)
@@ -67,9 +82,10 @@ class AppStarter
   end
 end
 
-puts @options
+Options.parse!
+puts Options.all
 
 # If no app name is given, default to the name of the current directory
 app = ARGV.empty? ? File.basename(ENV['PWD']) : ARGV.first
 
-AppStarter.new.start(app, @options)
+AppStarter.new.start(app, Options.all)
