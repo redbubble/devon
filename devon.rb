@@ -34,6 +34,81 @@ class Options
   end
 end
 
+class CircularDependencyException < StandardError
+  def initialize(apps)
+    @apps = apps
+    super("Circular dependency when resolving dependencies: #{apps_s}")
+  end
+
+  private
+
+  def apps_s
+    @apps.join('->')
+  end
+end
+
+class DependencyConflictException < StandardError
+  def initialize(new_app, existing_app)
+    @new_app = new_app
+    @existing_app = existing_app
+    super("Dependency conflict when resolving dependencies: #{new_app.name} in '#{new_app.mode}' mode conflicts with #{existing_app.name} in '#{existing_app.mode}' mode.")
+  end
+
+  private
+
+  def apps_s
+    @apps.join('->')
+  end
+end
+
+class DependencyResolver
+  def initialize()
+    @apps = []
+  end
+
+  def add(app, dep_chain: [])
+    # Check if it's possible to add the incoming app to our collection. Raise an
+    # appropriate error if not.
+    if dep_chain.has_key?(app.name)
+      raise CircularDependencyException.new(dep_chain)
+    end
+
+    if @apps.has_key?(app.name)
+      if apps[app.name].mode != app.mode
+        # We're trying to depend on the same app in two different modes. This has
+        # so much potential to go wrong that we're better off not even trying.
+        raise DependencyConflictException.new(app, apps[app.name])
+      else
+        # We already have this dependency on our list, so there's nothing to do.
+        #
+        # But wait, isn't this a circular dependency? Well, no. We checked for
+        # that above. We can get here when A depends on B and C, and both B and
+        # C depend on D, which is allowed.
+        #
+        return
+    end
+
+    # Add this app to our collection
+    apps << app
+
+    # Is it a bird?
+    # Is it a plane?
+    # No! It's depth-first recursion!
+    app.dependencies.each do |dep, dep_mode|
+      add(App.new(dep, dep_mode), dep_chain << app.name)
+    end
+  end
+
+  def start
+    # Reverse order so that dependencies are started before their dependents.
+    apps.reverse.each { |app| app.start }
+  end
+
+  private
+
+  attr_reader :apps
+end
+
 class App
 
   class CouldNotReadConfigException < StandardError
@@ -66,6 +141,12 @@ class App
     @mode = mode
   end
 
+  attr_accessor :app, :mode
+
+  def dependencies
+    mode_config['dependencies']
+  end
+
   def start
 
     puts "Starting #{name} in #{mode} mode..."
@@ -74,18 +155,6 @@ class App
       puts config
     end
 
-
-    # Is it a bird?
-    # Is it a plane?
-    # No! It's depth-first recursion!
-    #
-    # TODO: Maybe handle some errors?
-    #
-    mode_config['dependencies'].each do |dep, dep_mode|
-      new(dep, dep_mode).start
-    end
-
-    # Finally, actually start the thing
     if Options.verbose?
       puts "Running command: '#{command}'"
     end
