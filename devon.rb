@@ -39,16 +39,14 @@ class App
   class CouldNotReadConfigException < StandardError
     def initialize(app)
       @app = app
-      msg = "Aw, shoot! It seems as though #{app} has a problem with the YAML syntax in its #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :("
-      super(msg)
+      super("Aw, shoot! It seems as though #{app} has a problem with the YAML syntax in its #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :(")
     end
   end
 
   class NoConfigFileException < StandardError
     def initialize(app)
       @app = app
-      msg = "Oh noes! It looks like #{app} doesn't have a #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :("
-      super(msg)
+      super("Oh noes! It looks like #{app} doesn't have a #{AppStarter::CONFIG_FILE_NAME}, so devon can't start it :(")
     end
   end
 
@@ -56,8 +54,7 @@ class App
     def initialize(app, mode)
       @app = app
       @mode = mode
-      msg = "Gadzooks! It appears that #{app} doesn't have a mode called '#{mode}', so devon can't start it :("
-      super(msg)
+      super("Gadzooks! It appears that #{app} doesn't have a mode called '#{mode}', so devon can't start it :(")
     end
   end
 
