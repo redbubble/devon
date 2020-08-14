@@ -34,7 +34,7 @@ class Options
   end
 end
 
-class AppStarter
+class App
 
   class CouldNotReadConfigException < StandardError
     def initialize(app)
@@ -55,17 +55,20 @@ class AppStarter
   SOURCE_CODE_BASE = "#{ENV['HOME']}/src"
   CONFIG_FILE_NAME = 'devon.conf.yaml'
 
-  def start(app, mode)
+  def initialize(name, mode)
+    @name = name
+    @mode = mode
+  end
 
-    puts "Starting #{app} in #{mode} mode..."
+  def start
+
+    puts "Starting #{name} in #{mode} mode..."
 
     if Options.verbose?
       puts config
     end
 
-    raise "Could not find a mode named '#{mode}' for application '#{app}'." unless config['modes'].has_key?(mode)
-
-    mode_config = config['modes'][mode]
+    raise "Could not find a mode named '#{mode}' for application '#{name}'." unless config['modes'].has_key?(mode)
 
     # Is it a bird?
     # Is it a plane?
@@ -74,7 +77,7 @@ class AppStarter
     # TODO: Maybe handle some errors?
     #
     mode_config['dependencies'].each do |dep, dep_mode|
-      start(dep, options.merge({mode: dep_mode}))
+      new(dep, dep_mode).start
     end
 
     # Finally, actually start the thing
@@ -85,20 +88,24 @@ class AppStarter
       puts "Running command: '#{command}'"
     end
 
-    system("cd #{File.join(SOURCE_CODE_BASE, app)}; #{command}")
+    system("cd #{File.join(SOURCE_CODE_BASE, name)}; #{command}")
+  end
+
+  def mode_config
+    config['modes'][mode]
   end
 
   def config
     return @config if @config
 
-    config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
+    config_path = File.join(SOURCE_CODE_BASE, name, CONFIG_FILE_NAME)
     @config =
       begin
         YAML.load(File.read(config_path))
       rescue Errno::ENOENT
-        raise NoConfigFileException.new(app)
+        raise NoConfigFileException.new(name)
       rescue Psych::SyntaxError
-        raise CouldNotReadConfigException.new(app)
+        raise CouldNotReadConfigException.new(name)
       end
   end
 end
