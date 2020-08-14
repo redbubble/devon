@@ -127,4 +127,4 @@ puts Options.all
 # If no app name is given, default to the name of the current directory
 app = ARGV.empty? ? File.basename(ENV['PWD']) : ARGV.first
 
-AppStarter.new.start(app, Options.mode)
+App.new.start(app, Options.mode)
