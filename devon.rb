@@ -38,8 +38,7 @@ class Options
 end
 
 class AppStarter
-  def start(app, options)
-    mode = options[:mode]
+  def start(app, mode)
 
     config_path = File.join(SOURCE_CODE_BASE, app, CONFIG_FILE_NAME)
     config =
@@ -52,7 +51,7 @@ class AppStarter
 
     puts "Starting #{app} in #{mode} mode..."
 
-    if options[:verbose]
+    if Options.verbose?
       puts config
     end
 
@@ -74,7 +73,7 @@ class AppStarter
     # This is naive af, but it should be OK for a PoC...
     command = mode_config['command'].join(" ")
 
-    if options[:verbose]
+    if Options.verbose?
       puts "Running command: '#{command}'"
     end
 
@@ -88,4 +87,4 @@ puts Options.all
 # If no app name is given, default to the name of the current directory
 app = ARGV.empty? ? File.basename(ENV['PWD']) : ARGV.first
 
-AppStarter.new.start(app, Options.all)
+AppStarter.new.start(app, Options.mode)
