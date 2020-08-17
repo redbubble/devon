@@ -20,20 +20,10 @@ devon <repo-name>
 
 starts the named application in Development mode, with its dependencies in Dependency mode (see [Modes](#modes)).
 
-### Using a config file
-
-```
-devon -f <config-path>
-```
-
 ### Options
 
 `--mode`, `-m`
 : Specify the mode. Default: `development`
-
-`--file`, `-f`
-: Use a configuration file that specifies a set of applications and modes to run.
-
 
 ## Modes
 
