@@ -10,8 +10,13 @@ require 'app'
 Options.parse!
 puts Options.all
 
-# If no app name is given, default to the name of the current directory
-app = ARGV.empty? ? File.basename(ENV['PWD']) : ARGV.first
+# If no app name is given, default to the name of the current git repo
+app = if ARGV.empty?
+        repo_path = `git rev-parse --show-toplevel`
+        File.basename(repo_path)
+      else
+        ARGV.first
+      end
 
 puts "Starting #{app} in '#{Options.mode}' mode"
 
