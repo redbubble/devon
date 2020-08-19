@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/redbubble/devon/domain"
+	"github.com/redbubble/devon/resolver"
 )
 
 // startCmd represents the start command
@@ -43,7 +44,8 @@ var startCmd = &cobra.Command{
 		appConfig, err := app.Config()
 		bail(err)
 
-		fmt.Printf("%v\n\n", appConfig)
+		apps := make([]App, 0, 1)
+		apps, err = resolver.Add(apps, app)
 	},
 }
 
