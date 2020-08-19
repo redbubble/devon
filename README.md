@@ -43,6 +43,16 @@ Runs the application, but doesn't pay attention to code changes. Usually, this w
 
 Each application can specify custom modes, to enable or disable specific functions. For example, an application with both a synchronous frontend and an async backend worker might have the worker disabled by default, and use a custom mode to enable it, or to run it in isolation.
 
+## Important assumptions
+
+### All app repos live in ~/src
+
+It'd be good to allow for overriding this, but it's not done yet.
+
+### One app should never be started in 2 modes at the same time
+
+I (Lucas) can't think of a sane use case for that, so I'm pretty sure this assumption is safe.
+
 ## Development
 
 **[Trello board](https://trello.com/b/MsxE9Nw6/devon-the-dev-application-starter)**
