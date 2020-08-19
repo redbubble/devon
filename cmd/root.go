@@ -53,9 +53,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.devon.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("verbose", "v", false, "Print all the informations!")
+	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print all the informations!")
+	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 }
 
 // initConfig reads in config file and ENV variables if set.
