@@ -70,7 +70,21 @@ class App
   private
 
   def read_config
-    config_path = File.join(SOURCE_CODE_BASE, name, CONFIG_FILE_NAME)
+    # Check if the app directory is present
+    application_path = File.join(SOURCE_CODE_BASE, name)
+    puts application_path
+
+    # If it doesn't exist, clone it
+    if Dir.exist?(application_path)
+      `git -C #{application_path} pull`
+    else
+      `git clone git@github.com:redbubble/#{name} #{application_path}`
+    end
+	  #
+	  # If yes -- either assume it's up-to-date, or try to pull it
+	  # Maybe we can decide what to do based on the state of the repo
+    
+    config_path = File.join(application_path, CONFIG_FILE_NAME)
     YAML.load(File.read(config_path))
   rescue Errno::ENOENT
     raise NoConfigFileException.new(name)

@@ -13,8 +13,7 @@
 # can use as many or as few of these as we need.
 #
 dependencies: &default_dependencies
-  imagehaus: dependency
-  renderraum: static
+  feed-service: depedency
 
 # The different modes in which your app can run (on a dev or test machine).
 # `development` and `dependency` have sensible defaults, but you should adjust

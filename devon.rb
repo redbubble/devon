@@ -12,7 +12,7 @@ puts Options.all
 
 # If no app name is given, default to the name of the current git repo
 app = if ARGV.empty?
-        repo_path = `git rev-parse --show-toplevel`
+	repo_path = `git rev-parse --show-toplevel`.chomp
         File.basename(repo_path)
       else
         ARGV.first
