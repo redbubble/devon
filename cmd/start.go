@@ -22,22 +22,17 @@ var startCmd = &cobra.Command{
 	Short: "Start your chosen application, along with its dependencies",
 	Long: ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("start called")
-
 		// Figure out which app to start
 		var appName string
-		// var err error
+		var err error
 
 		if len(args) > 0 {
 			appName = args[0]
 		} else {
 			gitPath, err := currentGitRepo()
-			appName = filepath.Base(gitPath)
+			bail(err)
 
-			if err != nil {
-				fmt.Printf("%v\n", err)
-				os.Exit(1)
-			}
+			appName = filepath.Base(gitPath)
 		}
 
 		// Read the devon config for that app
@@ -45,8 +40,18 @@ var startCmd = &cobra.Command{
 			Name: appName,
 		}
 
-		fmt.Println(app.DevonConfigPath())
+		appConfig, err := app.Config()
+		bail(err)
+
+		fmt.Printf("%v\n\n", appConfig)
 	},
+}
+
+func bail(err error) {
+	if err != nil {
+		fmt.Printf("%v", err)
+		os.Exit(1)
+	}
 }
 
 func init() {
