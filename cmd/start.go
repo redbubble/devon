@@ -12,10 +12,13 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/redbubble/devon/domain"
 	"github.com/redbubble/devon/resolver"
 )
+
+var mode string
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -36,22 +39,29 @@ var startCmd = &cobra.Command{
 			appName = filepath.Base(gitPath)
 		}
 
-		// Read the devon config for that app
-		app := domain.App{
-			Name: appName,
-		}
+		fmt.Printf("Starting %s in '%s' mode\n", appName, mode)
 
-		appConfig, err := app.Config()
+		app, err := domain.NewApp(appName, mode)
 		bail(err)
 
-		apps := make([]App, 0, 1)
+		apps := make([]domain.App, 0, 1)
 		apps, err = resolver.Add(apps, app)
+		bail(err)
+
+		if viper.IsSet("verbose") {
+			fmt.Println("Devon will start these apps:")
+
+			for i := 0; i < len(apps); i++ {
+				fmt.Printf("* %s (in '%v' mode)\n", apps[i].Name, apps[i].Mode.Name)
+			}
+		}
+
 	},
 }
 
 func bail(err error) {
 	if err != nil {
-		fmt.Printf("%v", err)
+		fmt.Printf("ERROR: %v", err)
 		os.Exit(1)
 	}
 }
@@ -64,7 +74,7 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
-	rootCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
+	startCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:

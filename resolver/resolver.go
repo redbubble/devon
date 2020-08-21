@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/redbubble/devon/domain"
-	"github.com/spf13/viper"
 )
 
 func Add(apps []domain.App, app domain.App) ([]domain.App, error) {
@@ -12,14 +11,6 @@ func Add(apps []domain.App, app domain.App) ([]domain.App, error) {
 
 	if err != nil {
 		return nil, err
-	}
-
-	if viper.IsSet("verbose") {
-		fmt.Println("Devon will start these apps:")
-
-		for i := 0; i < len(starting_apps); i++ {
-			fmt.Println("* %s (in '%s' mode)")
-		}
 	}
 
 	return starting_apps, nil

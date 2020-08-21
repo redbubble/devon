@@ -17,6 +17,8 @@ const configFileName = "devon.conf.yaml"
 type App struct {
 	Name      string
 	SourceDir string
+	Config    Config
+	Mode      Mode
 }
 
 type Config struct {
@@ -29,23 +31,56 @@ type Mode struct {
 	Dependencies map[string]string
 }
 
-func (a *App) Config() (Config, error) {
-	// TODO: Memoize?
+func NewApp(name string, modeName string) (App, error) {
+	var err error
+
+	app := App{
+		Name: name,
+	}
+
+	sourceDir, err := defaultSourceDir(name)
+
+	if err != nil {
+		return App{}, err
+	}
+
+	config, err := readConfig(app)
+
+	if err != nil {
+		return App{}, err
+	}
+
+	mode, ok := config.Modes[modeName]
+
+	if !ok {
+		return App{},
+			fmt.Errorf("Couldn't find a mode called '%s' in the config for %s\n", modeName, name)
+	}
+
+	return App{
+		Name: name,
+		SourceDir: sourceDir,
+		Config: config,
+		Mode: mode,
+	}, nil
+}
+
+func readConfig(app App) (Config, error) {
 	var err error
 	var bytes []byte
 	var config Config
 
-	configPath, err := a.configPath()
+	path := configPath(app)
 
 	if viper.IsSet("verbose") {
-		fmt.Printf("Reading %s application metadata from: %s\n", a.Name, configPath)
+		fmt.Printf("Reading %s application metadata from: %s\n", app.Name, path)
 	}
 
 	if err != nil {
 		return Config{}, err
 	}
 
-	bytes, err = ioutil.ReadFile(configPath)
+	bytes, err = ioutil.ReadFile(path)
 
 	if err != nil {
 		return Config{}, err
@@ -57,31 +92,33 @@ func (a *App) Config() (Config, error) {
 		return Config{}, err
 	}
 
+	// Modifying properties of an object in a map is not allowed, so we have
+	// to create a whole new object and assign that to the map.
+	for name, mode := range config.Modes {
+		newMode := Mode{
+			Name: name,
+			Command: mode.Command,
+			Dependencies: mode.Dependencies,
+		}
+
+		config.Modes[name] = newMode
+	}
+
 	return config, nil
 }
 
-func (a *App) sourceDir() (string, error) {
-	if a.SourceDir != "" {
-		return a.SourceDir, nil
-	}
-
-	path := filepath.Join(defaultSourceCodeBase, a.Name)
+func defaultSourceDir(appName string) (string, error) {
+	path := filepath.Join(defaultSourceCodeBase, appName)
 
 	if isDirectory(path) {
 		return path, nil
 	}
 
-	return "", fmt.Errorf("Couldn't find a source code directory for '%s'.")
+	return "", fmt.Errorf("Couldn't find a source code directory for '%s'.", appName)
 }
 
-func (a *App) configPath() (string, error) {
-	sourceDir, err := a.sourceDir()
-
-	if err != nil {
-		return "", err
-	}
-
-	return filepath.Join(sourceDir, configFileName), nil
+func configPath(a App) (string) {
+	return filepath.Join(a.SourceDir, configFileName)
 }
 
 func isDirectory(path string) bool {
