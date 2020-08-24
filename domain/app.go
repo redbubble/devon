@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var defaultSourceCodeBase = os.Getenv("HOME") + "/src"
+var DefaultSourceCodeBase = os.Getenv("HOME") + "/src"
 
 const configFileName = "devon.conf.yaml"
 
@@ -104,7 +104,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 }
 
 func defaultSourceDir(appName string) (string, error) {
-	path := filepath.Join(defaultSourceCodeBase, appName)
+	path := filepath.Join(DefaultSourceCodeBase, appName)
 
 	if isDirectory(path) {
 		return path, nil

@@ -36,11 +36,6 @@ func add(apps []domain.App, app domain.App, depChain []string) ([]domain.App, er
 	//    There's nothing to do, so we can return now.
 	//   If the modes are different, we have conflicting dependencies.
 	//    Return an error.
-	//
-	// We could choose to break early when we encounter a matching app, on
-	// the assumption that `apps` will never contain two apps with the same
-	// name. But let's play it safe -- bugs happen, and N is likely to be
-	// small.
 	for j := 0; j < len(apps); j++ {
 		if apps[j].Name == app.Name {
 			if apps[j].Mode.Name == app.Mode.Name {
