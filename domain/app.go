@@ -34,17 +34,13 @@ type Mode struct {
 func NewApp(name string, modeName string) (App, error) {
 	var err error
 
-	app := App{
-		Name: name,
-	}
-
 	sourceDir, err := defaultSourceDir(name)
 
 	if err != nil {
 		return App{}, err
 	}
 
-	config, err := readConfig(app)
+	config, err := readConfig(name, sourceDir)
 
 	if err != nil {
 		return App{}, err
@@ -65,15 +61,15 @@ func NewApp(name string, modeName string) (App, error) {
 	}, nil
 }
 
-func readConfig(app App) (Config, error) {
+func readConfig(appName string, sourceDir string) (Config, error) {
 	var err error
 	var bytes []byte
 	var config Config
 
-	path := configPath(app)
+	path := filepath.Join(sourceDir, configFileName)
 
 	if viper.IsSet("verbose") {
-		fmt.Printf("Reading %s application metadata from: %s\n", app.Name, path)
+		fmt.Printf("Reading %s application metadata from: %s\n", appName, path)
 	}
 
 	if err != nil {
@@ -115,10 +111,6 @@ func defaultSourceDir(appName string) (string, error) {
 	}
 
 	return "", fmt.Errorf("Couldn't find a source code directory for '%s'.", appName)
-}
-
-func configPath(a App) (string) {
-	return filepath.Join(a.SourceDir, configFileName)
 }
 
 func isDirectory(path string) bool {
