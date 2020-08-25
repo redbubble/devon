@@ -15,9 +15,9 @@ func TestAdd(t *testing.T) {
 	// Adds the given app to the list of apps to be started
 	apps := []domain.App{}
 	app := domain.App{
-		Name: "testfenster",
+		Name:      "testfenster",
 		SourceDir: "",
-		Config: domain.Config{},
+		Config:    domain.Config{},
 		Mode: domain.Mode{
 			Dependencies: make(map[string]string),
 		},
@@ -29,7 +29,7 @@ func TestAdd(t *testing.T) {
 		t.Errorf("Error: %v\n", err)
 	}
 
-	expectedAppNames := []string{ app.Name }
+	expectedAppNames := []string{app.Name}
 
 	if len(actual) != len(expectedAppNames) {
 		t.Errorf("Expected %d apps, got %d", len(expectedAppNames), len(actual))
@@ -46,9 +46,9 @@ func TestAdd(t *testing.T) {
 	dependencies["first-dep"] = "dependency"
 
 	appWithDependencies := domain.App{
-		Name: "testfenster",
+		Name:      "testfenster",
 		SourceDir: "",
-		Config: domain.Config{},
+		Config:    domain.Config{},
 		Mode: domain.Mode{
 			Dependencies: dependencies,
 		},
@@ -76,9 +76,9 @@ func TestAdd(t *testing.T) {
 	dependencies["kreis"] = "dependency"
 
 	appWithCircularDependency := domain.App{
-		Name: "kreis",
+		Name:      "kreis",
 		SourceDir: "",
-		Config: domain.Config{},
+		Config:    domain.Config{},
 		Mode: domain.Mode{
 			Dependencies: dependencies,
 		},
@@ -101,9 +101,9 @@ func TestAdd(t *testing.T) {
 	}
 
 	conflictingApp := domain.App{
-		Name: "testfenster",
+		Name:      "testfenster",
 		SourceDir: "",
-		Config: domain.Config{},
+		Config:    domain.Config{},
 		Mode: domain.Mode{
 			Name: "development",
 		},

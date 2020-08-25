@@ -24,7 +24,7 @@ var mode string
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start your chosen application, along with its dependencies",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Figure out which app to start
 		var appName string

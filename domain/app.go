@@ -58,10 +58,10 @@ func NewApp(name string, modeName string) (App, error) {
 	}
 
 	return App{
-		Name: name,
+		Name:      name,
 		SourceDir: sourceDir,
-		Config: config,
-		Mode: mode,
+		Config:    config,
+		Mode:      mode,
 	}, nil
 }
 
@@ -96,8 +96,8 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	// to create a whole new object and assign that to the map.
 	for name, mode := range config.Modes {
 		newMode := Mode{
-			Name: name,
-			Command: mode.Command,
+			Name:         name,
+			Command:      mode.Command,
 			Dependencies: mode.Dependencies,
 		}
 
@@ -107,7 +107,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	return config, nil
 }
 
-func defaultSourceDir(appName string) (string) {
+func defaultSourceDir(appName string) string {
 	return filepath.Join(DefaultSourceCodeBase, appName)
 }
 

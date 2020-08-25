@@ -30,8 +30,8 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "devon",
 	Short: "For starting systems in dev",
-	Long: ``,
-	Run: func(cmd *cobra.Command, args []string) { },
+	Long:  ``,
+	Run:   func(cmd *cobra.Command, args []string) {},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
