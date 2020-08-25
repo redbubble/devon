@@ -69,7 +69,7 @@ func appName(args []string) (string, error) {
 
 func bail(err error) {
 	if err != nil {
-		fmt.Printf("ERROR: %v", err)
+		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
 }
