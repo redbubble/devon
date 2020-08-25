@@ -53,6 +53,16 @@ It'd be good to allow for overriding this, but it's not done yet.
 
 I (Lucas) can't think of a sane use case for that, so I'm pretty sure this assumption is safe.
 
+### Applications run in the background
+
+If Devon starts applications by running commands naively (e.g. without spawning a child process), then those applications can interrupt the starting process by running in the foreground. Because they never exit, subsequent applications wouldn't be able to start.
+
+### All dependency relationships are the same
+
+At the moment, a dependency relationship means "A depends on B to work properly, but A can start even if B isn't running." This is optimistic, since there is nothing stopping A from crashing if B is not available at startup.
+
+This probably needs fixing with an actual dependency graph implementation -- the current implementation just builds a list that includes all the dependencies, with no information about which apps depend on which others. Hence, there's no reliable way to figure out what to start first.
+
 ## Development
 
 **[Trello board](https://trello.com/b/MsxE9Nw6/devon-the-dev-application-starter)**
