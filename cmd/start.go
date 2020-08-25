@@ -45,15 +45,41 @@ var startCmd = &cobra.Command{
 		if viper.IsSet("verbose") {
 			fmt.Println("Devon will start these apps:")
 
-			for i := 0; i < len(apps); i++ {
-				fmt.Printf("* %s (in '%v' mode)\n", apps[i].Name, apps[i].Mode.Name)
+			printAppList(apps)
+		}
+
+		// Iterate through the list backwards. This gives the best
+		// chance (though it doesn't guarantee) that dependencies will
+		// be started before their dependents.
+		startedApps := make([]domain.App, 0, len(apps))
+		failedApps := make([]domain.App, 0, len(apps))
+
+		for i := len(apps) - 1; i >= 0; i-- {
+			err = apps[i].Start()
+
+			if err == nil {
+				startedApps = append(startedApps, apps[i])
+			} else {
+				fmt.Printf("WARNING: Could not start %s: %v\n", apps[i].Name, err)
+				failedApps = append(failedApps, apps[i])
 			}
 		}
 
+		if viper.IsSet("verbose") {
+			fmt.Printf("These apps started successfully:\n")
+			printAppList(startedApps)
+			fmt.Println()
+		}
+
+		if len(failedApps) > 0 {
+			fmt.Printf("Some apps failed to start:\n")
+			printAppList(failedApps)
+			os.Exit(1)
+		}
 	},
 }
 
-func appName(args []string) (string, error) {
+func getAppName(args []string) (string, error) {
 	if len(args) > 0 {
 		return args[0], nil
 	}
@@ -100,4 +126,10 @@ func currentGitRepo() (string, error) {
 	trimmedOutput := strings.TrimSuffix(string(output), "\n")
 
 	return trimmedOutput, nil
+}
+
+func printAppList(apps []domain.App) {
+	for _, a := range apps {
+		fmt.Printf("* %s (in '%s' mode)\n", a.Name, a.Mode.Name)
+	}
 }

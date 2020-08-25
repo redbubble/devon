@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -63,6 +64,56 @@ func NewApp(name string, modeName string) (App, error) {
 		Config:    config,
 		Mode:      mode,
 	}, nil
+}
+
+func (a *App) Start() error {
+	executable, err := a.executable()
+
+	cmd := exec.Cmd{
+		Path: executable,
+		Args: a.Mode.Command,
+		Dir: a.SourceDir,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
+
+	fmt.Println()
+	fmt.Printf("----- Starting %s -----\n", a.Name)
+
+	if viper.IsSet("verbose") {
+		fmt.Printf("Working directory: %s\n", cmd.Dir)
+		fmt.Printf("Command: %v\n", cmd.Args)
+		fmt.Println()
+	}
+
+	err = cmd.Start()
+
+	if err != nil {
+		return err
+	}
+
+	return cmd.Wait()
+}
+
+func (a *App) executable() (string, error) {
+	command := a.Mode.Command
+
+	// In the case of tools like `make`, the executable will be on the PATH
+	// and LookPath will find it.
+	executable, err := exec.LookPath(command[0])
+
+	// If not, the executable may be a script within the repo. LookPath will
+	// only find that if we give it a complete path, including the
+	// application directory.
+	if err != nil {
+		executable, err = exec.LookPath(filepath.Join(a.SourceDir, command[0]))
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	return executable, nil
 }
 
 func readConfig(appName string, sourceDir string) (Config, error) {
