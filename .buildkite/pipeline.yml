@@ -1,0 +1,9 @@
+steps:
+  - name: 'Check formatting'
+    command: ./build.sh
+    env:
+      BUILD_ARGS: 'fmt'
+  - name: 'Unit tests'
+    command: ./build.sh
+    env:
+      BUILD_ARGS: 'test'

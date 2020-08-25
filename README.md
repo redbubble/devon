@@ -7,7 +7,7 @@ _Because it's time to do dev on our stuff!_
 ### In an application repo
 
 ```
-devon
+devon start
 ```
 
 starts the local application (whose repo is the current working directory) in Development mode, with its dependencies in Dependency mode (see [Modes](#modes)).
@@ -15,7 +15,7 @@ starts the local application (whose repo is the current working directory) in De
 ### From another directory
 
 ```
-devon <repo-name>
+devon start <repo-name>
 ```
 
 starts the named application in Development mode, with its dependencies in Dependency mode (see [Modes](#modes)).
@@ -24,6 +24,9 @@ starts the named application in Development mode, with its dependencies in Depen
 
 `--mode`, `-m`
 : Specify the mode. Default: `development`
+
+`--verbose`, `-v`
+: Print some more information about what's happening.
 
 ## Modes
 
@@ -42,6 +45,26 @@ Runs the application, but doesn't pay attention to code changes. Usually, this w
 ### Custom modes
 
 Each application can specify custom modes, to enable or disable specific functions. For example, an application with both a synchronous frontend and an async backend worker might have the worker disabled by default, and use a custom mode to enable it, or to run it in isolation.
+
+## Important assumptions
+
+### All app repos live in ~/src
+
+It'd be good to allow for overriding this, but it's not done yet.
+
+### One app should never be started in 2 modes at the same time
+
+I (Lucas) can't think of a sane use case for that, so I'm pretty sure this assumption is safe.
+
+### Applications run in the background
+
+If Devon starts applications by running commands naively (e.g. without spawning a child process), then those applications can interrupt the starting process by running in the foreground. Because they never exit, subsequent applications wouldn't be able to start.
+
+### All dependency relationships are the same
+
+At the moment, a dependency relationship means "A depends on B to work properly, but A can start even if B isn't running." This is optimistic, since there is nothing stopping A from crashing if B is not available at startup.
+
+This probably needs fixing with an actual dependency graph implementation -- the current implementation just builds a list that includes all the dependencies, with no information about which apps depend on which others. Hence, there's no reliable way to figure out what to start first.
 
 ## Development
 

@@ -1,0 +1,5 @@
+modes:
+  development:
+    command: ["bar"]
+  unguessable:
+    command: ["baz"]
