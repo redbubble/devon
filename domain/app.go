@@ -34,7 +34,11 @@ type Mode struct {
 func NewApp(name string, modeName string) (App, error) {
 	var err error
 
-	sourceDir, err := defaultSourceDir(name)
+	sourceDir := defaultSourceDir(name)
+
+	if !isDirectory(sourceDir) {
+		return App{}, fmt.Errorf("Couldn't find a source code directory for '%s'.", name)
+	}
 
 	if err != nil {
 		return App{}, err
@@ -103,14 +107,8 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	return config, nil
 }
 
-func defaultSourceDir(appName string) (string, error) {
-	path := filepath.Join(DefaultSourceCodeBase, appName)
-
-	if isDirectory(path) {
-		return path, nil
-	}
-
-	return "", fmt.Errorf("Couldn't find a source code directory for '%s'.", appName)
+func defaultSourceDir(appName string) (string) {
+	return filepath.Join(DefaultSourceCodeBase, appName)
 }
 
 func isDirectory(path string) bool {
