@@ -12,7 +12,7 @@ define GOLANG_CONTAINER
 		--workdir /go/src/github.com/redbubble/${PROJECT_NAME}       \
 		--env GO111MODULE=on                                \
 		--env CGO_ENABLED=0                                 \
-		--interactive redbubble/golang:1.15
+		--interactive golang:1.15
 endef
 
 .PHONY: test
