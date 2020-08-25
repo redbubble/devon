@@ -7,7 +7,7 @@ _Because it's time to do dev on our stuff!_
 ### In an application repo
 
 ```
-devon
+devon start
 ```
 
 starts the local application (whose repo is the current working directory) in Development mode, with its dependencies in Dependency mode (see [Modes](#modes)).
@@ -15,7 +15,7 @@ starts the local application (whose repo is the current working directory) in De
 ### From another directory
 
 ```
-devon <repo-name>
+devon start <repo-name>
 ```
 
 starts the named application in Development mode, with its dependencies in Dependency mode (see [Modes](#modes)).
@@ -24,6 +24,9 @@ starts the named application in Development mode, with its dependencies in Depen
 
 `--mode`, `-m`
 : Specify the mode. Default: `development`
+
+`--verbose`, `-v`
+: Print some more information about what's happening.
 
 ## Modes
 
