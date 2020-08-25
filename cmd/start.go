@@ -30,14 +30,8 @@ var startCmd = &cobra.Command{
 		var appName string
 		var err error
 
-		if len(args) > 0 {
-			appName = args[0]
-		} else {
-			gitPath, err := currentGitRepo()
-			bail(err)
-
-			appName = filepath.Base(gitPath)
-		}
+		appName, err = getAppName(args)
+		bail(err)
 
 		fmt.Printf("Starting %s in '%s' mode\n", appName, mode)
 
@@ -57,6 +51,20 @@ var startCmd = &cobra.Command{
 		}
 
 	},
+}
+
+func appName(args []string) (string, error) {
+	if len(args) > 0 {
+		return args[0], nil
+	}
+
+	gitPath, err := currentGitRepo()
+
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Base(gitPath), nil
 }
 
 func bail(err error) {
