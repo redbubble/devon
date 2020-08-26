@@ -2,6 +2,25 @@
 
 _Because it's time to do dev on our stuff!_
 
+## Installation
+
+### Homebrew
+
+If you're on a Mac, you can use Homebrew to install Devon:
+
+```bash
+brew tap redbubble/devon
+brew install devon
+```
+
+### Download release from GitHub
+
+You can download pre-compiled binaries from the [Releases](https://github.com/redbubble/devon/releases) page. There are OSX and Linux archives for download, as well as RPM and DEB packages if that's your flavour.
+
+### Compile from source
+
+You can of course clone this repo using `git clone git@github.com:redbubble/devon` and build Devon yourself if you wish.
+
 ## Usage
 
 ### In an application repo
@@ -32,19 +51,34 @@ starts the named application in Development mode, with its dependencies in Depen
 
 You can run applications in various modes, to suit particular dev/test scenarios. Want to run the web app without the background workers? Make a mode for it. Want to run both? Another mode. Using placeholder data instead of calling out to a dependency? You guessed it: add a mode!
 
+In general, most apps should have at least two basic modes:
+
+1. `development`, which is used when you are actively making changes to an application, and
+2. `dependency`, which is used when you need an app to be running (e.g. to satisfy a runtime dependency of an app you're working on), but you aren't planning on making changes to it.
+
 See some examples in `example.yaml` in the root of this repo.
 
-### Development mode
+## Configuring your application
 
-Runs the application so that you can make changes to the code and see them in your running application. Usually this means running the application natively on your laptop, although there are exceptions. The exact implementation depends on that repo's `dev/dev.sh`.
+To start an app with Devon, you will need a config file called `devon.conf.yaml` in that app's Git repo. It should look something like this:
 
-### Dependency mode
+```yaml
+modes:
+  development:
+    command: ["bundle", "exec", "rails", "server"]
+    dependencies:
+      # These are key-value pairs, where the key is the name of
+      # the dependency's git repo, and the value is the name of
+      # the mode the dependency should be started in.
+      my-app: dependency
+      your-app: custom-mode
+  dependency:
+    command: ["dev/up.sh"]
+    dependencies:
+      my-app: dependency
+      your-app: dependency
+```
 
-Runs the application, but doesn't pay attention to code changes. Usually, this works by running a Docker container, though the exact implementation depends on that application's `dev/up.sh`.
-
-### Custom modes
-
-Each application can specify custom modes, to enable or disable specific functions. For example, an application with both a synchronous frontend and an async backend worker might have the worker disabled by default, and use a custom mode to enable it, or to run it in isolation.
 
 ## Influencing ideas
 
