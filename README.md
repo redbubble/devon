@@ -46,6 +46,24 @@ Runs the application, but doesn't pay attention to code changes. Usually, this w
 
 Each application can specify custom modes, to enable or disable specific functions. For example, an application with both a synchronous frontend and an async backend worker might have the worker disabled by default, and use a custom mode to enable it, or to run it in isolation.
 
+## Influencing ideas
+
+### Apps should document how to run them in dev
+
+This is an extension of the idea behind the `dev/up.sh` convention we've had for a long time now. Devon attempts to put a common interface on starting apps, so that if I'm hacking on an app for the first time, I don't have to worry about how to start it.
+
+### Apps should document their dependencies on other apps
+
+Just as we document our build-time dependencies with tools like `bundler` or `npm`, we should document our runtime dependencies. These are just as important when it comes to running the application.
+
+### The best documentation can be used for automation, too!
+
+Documentation can give us certainty. Once we have certainty (and consistent formatting), we can automate.
+
+### Convention over (but not instead of!) configuration
+
+Devon's conventions currently take the form of _stated assumptions_, as documented below. The aim is to gradually introduce some flexibility around those assumptions (e.g. by making them configurable), but keep defaults that make sense, so you don't have to configure *every little thing* in order to get started.
+
 ## Important assumptions
 
 ### All app repos live in ~/src
