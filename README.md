@@ -69,3 +69,16 @@ This probably needs fixing with an actual dependency graph implementation -- the
 ## Development
 
 **[Trello board](https://trello.com/b/MsxE9Nw6/devon-the-dev-application-starter)**
+
+### Pre-commit hooks (optional)
+
+This repo is set up to use `pre-commit` to share Git pre-commit hooks. The config is in `.pre-commit-config.yaml`. It's currently set up to check a few essential things:
+
+* Files end with \n
+* No trailing whitespace
+* YAML formatting
+* Golang formatting
+
+This is to help prevent CI failures when Lucas forgets to run `go fmt` before pushing his commits. You can use it too, but you don't have to. Install with `brew install pre-commit`, then run `pre-commit install` in the root of this repo.
+
+See https://pre-commit.com for more info.
