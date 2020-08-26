@@ -22,9 +22,14 @@ var mode string
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
-	Use:   "start",
+	Use:   "start [application] [flags]",
 	Short: "Start your chosen application, along with its dependencies",
-	Long:  ``,
+	Long: `Start your chosen application, along with its dependencies
+
+* If <application> is set, devon will start it and its dependencies.
+* If <application> is unset, devon will attempt to figure out which application
+  it should start, based on the current working directory.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Figure out which app to start
 		var appName string

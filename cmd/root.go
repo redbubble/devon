@@ -15,13 +15,18 @@ var version string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "devon",
-	Short: "For starting systems in dev",
-	Long:  ``,
+	Use:   "devon start [application] [flags]",
+	Short: "A tool to help you dev on your stuff",
+	Long: `A tool to help you dev on your stuff
+
+Devon starts applications for development, along with any other applications
+they depend on.
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if printVersion {
 			versionCmd()
-			return
+		} else {
+			cmd.Help()
 		}
 	},
 }
@@ -40,16 +45,12 @@ func Execute(devonVersion string) {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.devon.yaml)")
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print all the informations!")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
 
-	rootCmd.PersistentFlags().BoolVar(&printVersion, "version", false, "Print the current version and exit")
+	rootCmd.Flags().BoolVar(&printVersion, "version", false, "Print the current version and exit")
 }
 
 // initConfig reads in config file and ENV variables if set.
