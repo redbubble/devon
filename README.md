@@ -100,9 +100,13 @@ Devon's conventions currently take the form of _stated assumptions_, as document
 
 ## Important assumptions
 
-### All app repos live in ~/src
+### All app repos live in the same place
 
-It'd be good to allow for overriding this, but it's not done yet.
+By default, that place is `~/src`. You can override that by creating a config file called `.devon.yaml` in your home directory, with contents like this:
+
+```yaml
+source-code-base-dir: /path/to/your/code
+```
 
 ### One app should never be started in 2 modes at the same time
 
@@ -110,7 +114,7 @@ I (Lucas) can't think of a sane use case for that, so I'm pretty sure this assum
 
 ### Applications run in the background
 
-If Devon starts applications by running commands naively (e.g. without spawning a child process), then those applications can interrupt the starting process by running in the foreground. Because they never exit, subsequent applications wouldn't be able to start.
+Devon starts applications by running commands somewhat naively, waiting for each command to finish before starting the next. This means that applications can interrupt the starting process if they run in the foreground, instead of doing what we expect and starting a daemonised process. Because they never exit, subsequent applications wouldn't be able to start.
 
 ### All dependency relationships are the same
 

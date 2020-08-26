@@ -10,6 +10,7 @@ import (
 )
 
 var cfgFile string
+var sourceCodeBaseDir string
 var printVersion bool
 var version string
 
@@ -46,6 +47,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.devon.yaml)")
+
+	rootCmd.PersistentFlags().StringVar(&sourceCodeBaseDir, "source-code-base-dir", os.Getenv("HOME")+"/src", "Source code base directory. Devon assumes that all applications live in subdirectories of this base directory (default is $HOME/src)")
+	viper.BindPFlag("source-code-base-dir", rootCmd.PersistentFlags().Lookup("source-code-base-dir"))
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print all the informations!")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
