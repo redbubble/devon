@@ -1,18 +1,3 @@
-/*
-Copyright © 2020 Redbubble
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
@@ -25,18 +10,27 @@ import (
 )
 
 var cfgFile string
+var printVersion bool
+var version string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "devon",
 	Short: "For starting systems in dev",
 	Long:  ``,
-	Run:   func(cmd *cobra.Command, args []string) {},
+	Run: func(cmd *cobra.Command, args []string) {
+		if printVersion {
+			versionCmd()
+			return
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+func Execute(devonVersion string) {
+	version = devonVersion
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -54,6 +48,8 @@ func init() {
 
 	rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Print all the informations!")
 	viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
+
+	rootCmd.PersistentFlags().BoolVar(&printVersion, "version", false, "Print the current version and exit")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -80,4 +76,8 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func versionCmd() {
+	fmt.Printf("devon v%s\n", version)
 }

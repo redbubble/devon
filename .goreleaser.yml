@@ -1,0 +1,53 @@
+dist: ./bin
+builds:
+  - binary: devon
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+    ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -a -installsuffix cgo
+    env:
+      - CGO_ENABLED=0
+
+archives:
+  - id: devon
+    format: tar.gz
+    files:
+      - README.md
+      - static/completions/*
+nfpms:
+  - description: A tool to help you dev on your stuff
+    maintainer: Redbubble <domain@redbubble.com>
+    formats:
+      - deb
+      - rpm
+    license: MIT
+    # files:
+    #   "static/completions/devon.zsh": "/usr/share/zsh/vendor-completions/_devon"
+    #   "static/completions/devon.bash": "/usr/share/bash-completion/completions/devon"
+# blobs:
+#   - provider: s3
+#     bucket: devon-artefacts
+#     folder: "devons/{{.Version}}"
+# brews:
+#   - custom_require: ../s3_downloader.rb
+
+#     github:
+#       owner: redbubble
+#       name: homebrew-devon
+
+#     download_strategy: S3DownloadStrategy
+#     url_template: "s3://devon-artefacts/devons/{{ .Version }}/{{ .ArtifactName }}"
+
+#     commit_author:
+#       name: Redbubble Engineers
+#       email: engineers@redbubble.com
+
+#     folder: Formula
+#     homepage: "https://github.com/redbubble/devon"
+#     description: "Devon, Redbubble's dev environment starter."
+
+#     # So we can `brew test` the formula.
+#     test: |
+#       system "#{bin}/devon --version"
