@@ -8,7 +8,7 @@ import (
 func TestNewApp(t *testing.T) {
 	// Looks for a configuration file in the source code base directory
 	//
-	DefaultSourceCodeBase = "./test-fixtures/src"
+	SourceCodeBaseDir = "./test-fixtures/src"
 
 	expectedSourceDir := filepath.Join("test-fixtures", "src", "foo")
 

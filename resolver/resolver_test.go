@@ -10,7 +10,7 @@ import (
 
 func TestAdd(t *testing.T) {
 	workdir, _ := os.Getwd()
-	domain.DefaultSourceCodeBase = filepath.Join(workdir, "test-fixtures", "src")
+	domain.SourceCodeBaseDir = filepath.Join(workdir, "test-fixtures", "src")
 
 	// Adds the given app to the list of apps to be started
 	apps := []domain.App{}
