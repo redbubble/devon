@@ -70,9 +70,9 @@ func (a *App) Start() error {
 	executable, err := a.executable()
 
 	cmd := exec.Cmd{
-		Path: executable,
-		Args: a.Mode.Command,
-		Dir: a.SourceDir,
+		Path:   executable,
+		Args:   a.Mode.Command,
+		Dir:    a.SourceDir,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}

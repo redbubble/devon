@@ -4,7 +4,7 @@
 #
 # These will be the default dependencies for all modes, but you can override
 # them for individual modes by specifying `depends_on`.
-# 
+#
 # The key is the name of the application, and the value is the mode it should
 # run in.
 #
