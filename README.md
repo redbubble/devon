@@ -45,7 +45,10 @@ starts the named application in Development mode, with its dependencies in Depen
 : Specify the mode. Default: `development`
 
 `--verbose`, `-v`
-: Print some more information about what's happening.
+: Print some more information about what's happening. Default: `false`
+
+`--clone-missing-repos`, `-c`
+: Attempt to `git clone` any repos in the dependency graph that are not present in `~/src` (or whatever other directory you nominate as the source code root). Default: `false`
 
 ## Modes
 
