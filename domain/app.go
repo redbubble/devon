@@ -7,11 +7,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/viper"
 )
-
-var SourceCodeBaseDir string = viper.GetString("source-code-base-dir")
 
 const configFileName = "devon.conf.yaml"
 
@@ -35,17 +34,13 @@ type Mode struct {
 func NewApp(name string, modeName string) (App, error) {
 	var err error
 
-	sourceDir := defaultSourceDir(name)
-
-	if !isDirectory(sourceDir) {
-		return App{}, fmt.Errorf("Couldn't find a source code directory for '%s'.", name)
-	}
+	repoPath, err := getRepoPath(name)
 
 	if err != nil {
 		return App{}, err
 	}
 
-	config, err := readConfig(name, sourceDir)
+	config, err := readConfig(name, repoPath)
 
 	if err != nil {
 		return App{}, err
@@ -60,7 +55,7 @@ func NewApp(name string, modeName string) (App, error) {
 
 	return App{
 		Name:      name,
-		SourceDir: sourceDir,
+		SourceDir: repoPath,
 		Config:    config,
 		Mode:      mode,
 	}, nil
@@ -116,6 +111,41 @@ func (a *App) executable() (string, error) {
 	return executable, nil
 }
 
+func getRepoPath(appName string) (string, error) {
+	var err error
+	sourceDir := defaultSourceDir(appName)
+
+	if !isDirectory(sourceDir) {
+		repoUrlFormat := viper.GetString("repo-url-format")
+		if viper.GetBool("clone-missing-repos") {
+			repoUrl := fmt.Sprintf(repoUrlFormat, appName)
+
+			fmt.Printf("INFO: Cloning %s into %s\n", repoUrl, sourceDir)
+
+			cmd := exec.Command("git", "clone", repoUrl, sourceDir)
+			out, err := cmd.CombinedOutput()
+
+			if viper.IsSet("verbose") {
+				for _, line := range strings.Split(string(out), "\n") {
+					fmt.Printf("> %s\n", line)
+				}
+			}
+
+			if err != nil {
+				return "", fmt.Errorf("Couldn't find a source code directory for '%s', and couldn't `git clone` it.", appName)
+			}
+		} else {
+			return "", fmt.Errorf("Couldn't find a source code directory for '%s'. Consider enabling --clone-missing-repos.", appName)
+		}
+	}
+
+	if err != nil {
+		return "", err
+	}
+
+	return sourceDir, nil
+}
+
 func readConfig(appName string, sourceDir string) (Config, error) {
 	var err error
 	var bytes []byte
@@ -159,7 +189,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 }
 
 func defaultSourceDir(appName string) string {
-	return filepath.Join(SourceCodeBaseDir, appName)
+	return filepath.Join(viper.GetString("source-code-base-dir"), appName)
 }
 
 func isDirectory(path string) bool {

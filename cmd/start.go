@@ -19,6 +19,7 @@ import (
 )
 
 var mode string
+var clone bool
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -114,6 +115,9 @@ func init() {
 	// and all subcommands, e.g.:
 	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
 	startCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
+
+	startCmd.Flags().BoolVarP(&clone, "clone-missing-repos", "c", false, "Clone any repos we need, that aren't already present in the source code base dir. Default: false")
+	viper.BindPFlag("clone-missing-repos", startCmd.Flags().Lookup("clone-missing-repos"))
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
