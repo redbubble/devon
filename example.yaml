@@ -25,13 +25,13 @@ dependencies: &default_dependencies
 #
 modes:
   development:
-    command: ["bash", "-c", "sleep 5; echo Starting devon!"]
+    start-command: ["bash", "-c", "sleep 5; echo Starting devon!"]
     dependencies: *default_dependencies
   dependency:
-    command: ["./dev/up.sh"]
+    start-command: ["./dev/up.sh"]
     dependencies: *default_dependencies
   extra-dependencies:
-    command: ["make", "local"]
+    start-command: ["make", "local"]
     # This app takes the default list and extends it.
     dependencies:
       <<: *default_dependencies

@@ -28,7 +28,7 @@ type Config struct {
 
 type Mode struct {
 	Name         string
-	Command      []string
+	StartCommand []string `yaml:"start-command"`
 	Dependencies map[string]string
 }
 
@@ -71,7 +71,7 @@ func (a *App) Start() error {
 
 	cmd := exec.Cmd{
 		Path:   executable,
-		Args:   a.Mode.Command,
+		Args:   a.Mode.StartCommand,
 		Dir:    a.SourceDir,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -82,7 +82,7 @@ func (a *App) Start() error {
 
 	if viper.IsSet("verbose") {
 		fmt.Printf("Working directory: %s\n", cmd.Dir)
-		fmt.Printf("Command: %v\n", cmd.Args)
+		fmt.Printf("StartCommand: %v\n", cmd.Args)
 		fmt.Println()
 	}
 
@@ -96,7 +96,7 @@ func (a *App) Start() error {
 }
 
 func (a *App) executable() (string, error) {
-	command := a.Mode.Command
+	command := a.Mode.StartCommand
 
 	// In the case of tools like `make`, the executable will be on the PATH
 	// and LookPath will find it.
@@ -148,7 +148,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	for name, mode := range config.Modes {
 		newMode := Mode{
 			Name:         name,
-			Command:      mode.Command,
+			StartCommand: mode.StartCommand,
 			Dependencies: mode.Dependencies,
 		}
 
