@@ -3,12 +3,14 @@ package domain
 import (
 	"path/filepath"
 	"testing"
+
+	"github.com/spf13/viper"
 )
 
 func TestNewApp(t *testing.T) {
 	// Looks for a configuration file in the source code base directory
 	//
-	SourceCodeBaseDir = "./test-fixtures/src"
+	viper.Set("source-code-base-dir", "./test-fixtures/src")
 
 	expectedSourceDir := filepath.Join("test-fixtures", "src", "foo")
 

@@ -1,5 +1,5 @@
 modes:
   development:
-    command: ["bar"]
+    start-command: ["bar"]
   unguessable:
-    command: ["baz"]
+    start-command: ["baz"]

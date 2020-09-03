@@ -11,8 +11,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var SourceCodeBaseDir string = viper.GetString("source-code-base-dir")
-
 const configFileName = "devon.conf.yaml"
 
 type App struct {
@@ -28,7 +26,8 @@ type Config struct {
 
 type Mode struct {
 	Name         string
-	Command      []string
+	StartCommand []string `yaml:"start-command"`
+	StopCommand  []string `yaml:"stop-command"`
 	Dependencies map[string]string
 }
 
@@ -67,18 +66,51 @@ func NewApp(name string, modeName string) (App, error) {
 }
 
 func (a *App) Start() error {
-	executable, err := a.executable()
+	fmt.Println()
+	fmt.Printf("----- Starting %s -----\n", a.Name)
+
+	if len(a.Mode.StartCommand) == 0 {
+		return fmt.Errorf("Don't know how to start %s in '%s' mode, because start-command is unset.", a.Name, a.Mode.Name)
+	}
+
+	return runCommand(a.Mode.StartCommand, a.SourceDir)
+}
+
+func (a *App) Stop() error {
+	fmt.Println()
+	fmt.Printf("----- Stopping %s -----\n", a.Name)
+
+	if len(a.Mode.StopCommand) == 0 {
+		return fmt.Errorf("Don't know how to stop %s in '%s' mode, because stop-command is unset.", a.Name, a.Mode.Name)
+	}
+
+	return runCommand(a.Mode.StopCommand, a.SourceDir)
+}
+
+func runCommand(command []string, sourceDir string) error {
+
+	// In the case of tools like `make`, the executable will be on the PATH
+	// and LookPath will find it.
+	executable, err := exec.LookPath(command[0])
+
+	// If not, the executable may be a script within the repo. LookPath will
+	// only find that if we give it a complete path, including the
+	// application directory.
+	if err != nil {
+		executable, err = exec.LookPath(filepath.Join(sourceDir, command[0]))
+	}
+
+	if err != nil {
+		return err
+	}
 
 	cmd := exec.Cmd{
 		Path:   executable,
-		Args:   a.Mode.Command,
-		Dir:    a.SourceDir,
+		Args:   command,
+		Dir:    sourceDir,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
-
-	fmt.Println()
-	fmt.Printf("----- Starting %s -----\n", a.Name)
 
 	if viper.IsSet("verbose") {
 		fmt.Printf("Working directory: %s\n", cmd.Dir)
@@ -93,27 +125,6 @@ func (a *App) Start() error {
 	}
 
 	return cmd.Wait()
-}
-
-func (a *App) executable() (string, error) {
-	command := a.Mode.Command
-
-	// In the case of tools like `make`, the executable will be on the PATH
-	// and LookPath will find it.
-	executable, err := exec.LookPath(command[0])
-
-	// If not, the executable may be a script within the repo. LookPath will
-	// only find that if we give it a complete path, including the
-	// application directory.
-	if err != nil {
-		executable, err = exec.LookPath(filepath.Join(a.SourceDir, command[0]))
-	}
-
-	if err != nil {
-		return "", err
-	}
-
-	return executable, nil
 }
 
 func readConfig(appName string, sourceDir string) (Config, error) {
@@ -148,7 +159,8 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	for name, mode := range config.Modes {
 		newMode := Mode{
 			Name:         name,
-			Command:      mode.Command,
+			StartCommand: mode.StartCommand,
+			StopCommand:  mode.StopCommand,
 			Dependencies: mode.Dependencies,
 		}
 
@@ -159,7 +171,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 }
 
 func defaultSourceDir(appName string) string {
-	return filepath.Join(SourceCodeBaseDir, appName)
+	return filepath.Join(viper.GetString("source-code-base-dir"), appName)
 }
 
 func isDirectory(path string) bool {

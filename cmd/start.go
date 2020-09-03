@@ -1,7 +1,3 @@
-/*
-Copyright © 2020 Redbubble
-
-*/
 package cmd
 
 import (
@@ -84,6 +80,12 @@ var startCmd = &cobra.Command{
 	},
 }
 
+func init() {
+	rootCmd.AddCommand(startCmd)
+
+	startCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
+}
+
 func getAppName(args []string) (string, error) {
 	if len(args) > 0 {
 		return args[0], nil
@@ -103,21 +105,6 @@ func bail(err error) {
 		fmt.Printf("ERROR: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(startCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// startCmd.PersistentFlags().String("foo", "", "A help for foo")
-	startCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// startCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 func currentGitRepo() (string, error) {

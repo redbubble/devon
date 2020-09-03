@@ -65,7 +65,7 @@ To start an app with Devon, you will need a config file called `devon.conf.yaml`
 ```yaml
 modes:
   development:
-    command: ["bundle", "exec", "rails", "server"]
+    start-command: ["bundle", "exec", "rails", "server"]
     dependencies:
       # These are key-value pairs, where the key is the name of
       # the dependency's git repo, and the value is the name of
@@ -73,7 +73,7 @@ modes:
       my-app: dependency
       your-app: custom-mode
   dependency:
-    command: ["dev/up.sh"]
+    start-command: ["dev/up.sh"]
     dependencies:
       my-app: dependency
       your-app: dependency

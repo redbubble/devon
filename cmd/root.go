@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"os"
+	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -63,16 +64,8 @@ func initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		// Search config in home directory with name ".devon" (without extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".devon")
+		viper.AddConfigPath(getConfigPath())
+		viper.SetConfigName("devon")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -81,6 +74,29 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+func getConfigPath() string {
+	configPath := os.Getenv("XDG_CONFIG_HOME")
+
+	if configPath == "" {
+		home, err := homedir.Dir()
+
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		configPath = filepath.Join(home, ".config")
+	}
+
+	devonPath := filepath.Join(configPath, "devon")
+
+	if _, err := os.Stat(devonPath); os.IsNotExist(err) {
+		os.MkdirAll(devonPath, 0700)
+	}
+
+	return devonPath
 }
 
 func versionCmd() {

@@ -5,12 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/spf13/viper"
+
 	"github.com/redbubble/devon/domain"
 )
 
 func TestAdd(t *testing.T) {
 	workdir, _ := os.Getwd()
-	domain.SourceCodeBaseDir = filepath.Join(workdir, "test-fixtures", "src")
+	viper.Set("source-code-base-dir", filepath.Join(workdir, "test-fixtures", "src"))
 
 	// Adds the given app to the list of apps to be started
 	apps := []domain.App{}
