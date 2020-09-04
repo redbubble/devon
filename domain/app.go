@@ -108,6 +108,7 @@ func runCommand(command []string, sourceDir string) error {
 		Path:   executable,
 		Args:   command,
 		Dir:    sourceDir,
+		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 	}
