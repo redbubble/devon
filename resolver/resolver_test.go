@@ -21,7 +21,7 @@ func TestAdd(t *testing.T) {
 		SourceDir: "",
 		Config:    domain.Config{},
 		Mode: domain.Mode{
-			Dependencies: make(map[string]string),
+			Dependencies: make([]domain.Dependency, 0, 1),
 		},
 	}
 
@@ -44,8 +44,12 @@ func TestAdd(t *testing.T) {
 	}
 
 	// Adds the given app's dependencies to the list of apps to be started
-	dependencies := make(map[string]string)
-	dependencies["first-dep"] = "dependency"
+	dependencies := []domain.Dependency{
+		domain.Dependency{
+			AppName:  "first-dep",
+			ModeName: "dependency",
+		},
+	}
 
 	appWithDependencies := domain.App{
 		Name:      "testfenster",
@@ -74,8 +78,12 @@ func TestAdd(t *testing.T) {
 	}
 
 	// Detects circular dependencies and returns an error
-	dependencies = make(map[string]string)
-	dependencies["kreis"] = "dependency"
+	dependencies = []domain.Dependency{
+		domain.Dependency{
+			AppName:  "kreis",
+			ModeName: "dependency",
+		},
+	}
 
 	appWithCircularDependency := domain.App{
 		Name:      "kreis",
