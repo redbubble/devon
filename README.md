@@ -75,6 +75,7 @@ modes:
         mode: dependency
   dependency:
     start-command: ["dev/up.sh"]
+    stop-command: ["dev/down.sh"]
     dependencies:
       - name: some-app
         mode: some-mode
