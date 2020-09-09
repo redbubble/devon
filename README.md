@@ -44,6 +44,9 @@ starts the named application in Development mode, with its dependencies in Depen
 `--mode`, `-m`
 : Specify the mode. Default: `development`
 
+`--skip`, `-s`
+: Names of any apps you don't want to start. Can be specified multiple times.
+
 `--verbose`, `-v`
 : Print some more information about what's happening.
 

@@ -7,8 +7,8 @@ import (
 	"github.com/redbubble/devon/domain"
 )
 
-func Add(apps []domain.App, app domain.App) ([]domain.App, error) {
-	startingApps, err := add(apps, app, make([]string, 0, len(apps)))
+func Add(apps []domain.App, app domain.App, skip []string) ([]domain.App, error) {
+	startingApps, err := add(apps, app, skip, make([]string, 0, len(apps)))
 
 	if err != nil {
 		return nil, err
@@ -17,8 +17,14 @@ func Add(apps []domain.App, app domain.App) ([]domain.App, error) {
 	return startingApps, nil
 }
 
-func add(apps []domain.App, app domain.App, depChain []string) ([]domain.App, error) {
+func add(apps []domain.App, app domain.App, skip []string, depChain []string) ([]domain.App, error) {
 	var startingApps []domain.App
+
+	// Has the user said they want to skip this app?
+	// If so, let's return early.
+	if checkSkip(app.Name, skip) {
+		return apps, nil
+	}
 
 	// Does the dependency chain already include this app?
 	// If so, we've got a circular dependency, so return an error.
@@ -55,7 +61,7 @@ func add(apps []domain.App, app domain.App, depChain []string) ([]domain.App, er
 			continue
 		}
 
-		startingApps, err = add(startingApps, dep, append(depChain, app.Name))
+		startingApps, err = add(startingApps, dep, skip, append(depChain, app.Name))
 
 		if err != nil {
 			return []domain.App{}, err
@@ -63,6 +69,16 @@ func add(apps []domain.App, app domain.App, depChain []string) ([]domain.App, er
 	}
 
 	return startingApps, nil
+}
+
+func checkSkip(appName string, skip []string) bool {
+	for _, s := range skip {
+		if appName == s {
+			return true
+		}
+	}
+
+	return false
 }
 
 func checkCircularDependency(appName string, depChain []string) bool {

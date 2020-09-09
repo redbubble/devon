@@ -15,6 +15,7 @@ import (
 )
 
 var mode string
+var skip []string
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
@@ -40,8 +41,12 @@ var startCmd = &cobra.Command{
 		bail(err)
 
 		apps := make([]domain.App, 0, 1)
-		apps, err = resolver.Add(apps, app)
+		apps, err = resolver.Add(apps, app, skip)
 		bail(err)
+
+		if len(apps) == 0 {
+			bail(fmt.Errorf("There are no apps to start. Consider checking %s/devon.conf.yaml to figure out what's going on.", app.SourceDir))
+		}
 
 		if viper.IsSet("verbose") {
 			fmt.Println("Devon will start these apps:")
@@ -84,6 +89,7 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 
 	startCmd.PersistentFlags().StringVarP(&mode, "mode", "m", "development", "The mode to run in, e.g. 'development' or 'dependency'. Default: development")
+	startCmd.PersistentFlags().StringSliceVarP(&skip, "skip", "s", []string{}, "Names of any apps you don't want to start. Can be specified multiple times.")
 }
 
 func getAppName(args []string) (string, error) {
