@@ -28,7 +28,12 @@ type Mode struct {
 	Name         string
 	StartCommand []string `yaml:"start-command"`
 	StopCommand  []string `yaml:"stop-command"`
-	Dependencies map[string]string
+	Dependencies []Dependency
+}
+
+type Dependency struct {
+	AppName  string `yaml:"name"`
+	ModeName string `yaml:"mode"`
 }
 
 func NewApp(name string, modeName string) (App, error) {

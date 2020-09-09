@@ -59,8 +59,8 @@ func add(apps []domain.App, app domain.App, depChain []string) ([]domain.App, er
 	startingApps = append(apps, app)
 
 	// Recursively add this app's dependencies
-	for dep_name, dep_mode := range app.Mode.Dependencies {
-		dep, err := domain.NewApp(dep_name, dep_mode)
+	for _, dependency := range app.Mode.Dependencies {
+		dep, err := domain.NewApp(dependency.AppName, dependency.ModeName)
 
 		if err != nil {
 			fmt.Printf("WARNING: %v\n", err)

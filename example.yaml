@@ -10,8 +10,10 @@
 # can use as many or as few of these blocks as we need.
 #
 dependencies: &default_dependencies
-  my-app: dependency
-  your-app: dependency
+  - name: some-app
+    mode: some-mode
+  - name: redbubble
+    mode: dependency
 
 # The different modes in which your app can run (on a dev or test machine).
 #

@@ -67,16 +67,19 @@ modes:
   development:
     start-command: ["bundle", "exec", "rails", "server"]
     dependencies:
-      # These are key-value pairs, where the key is the name of
-      # the dependency's git repo, and the value is the name of
-      # the mode the dependency should be started in.
-      my-app: dependency
-      your-app: custom-mode
+      # `name` is the name of the dependency's git repo.
+      # `mode` is the name of the mode the dependency should be started in.
+      - name: some-app
+        mode: some-mode
+      - name: redbubble
+        mode: dependency
   dependency:
     start-command: ["dev/up.sh"]
     dependencies:
-      my-app: dependency
-      your-app: dependency
+      - name: some-app
+        mode: some-mode
+      - name: some-other-app
+        mode: maybe-some-other-mode
 ```
 
 
