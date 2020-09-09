@@ -36,7 +36,7 @@ modes:
     start-command: ["make", "local"]
     # This app takes the default list and extends it.
     dependencies:
-      <<: *default_dependencies
-      extra-app: dependency
-      # We can override existing settings, too:
-      my-app: development
+      - name: extra-app
+        mode: dependency
+      - name: my-app
+        mode: development
