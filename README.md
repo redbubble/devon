@@ -106,7 +106,7 @@ Devon's conventions currently take the form of _stated assumptions_, as document
 
 ### All app repos live in the same place
 
-By default, that place is `~/src`. You can override that by creating a config file called `.devon.yaml` in your home directory, with contents like this:
+By default, that place is `~/src`. You can override that by creating a config file called `devon.yaml` in your `~/.config` directory, with contents like this:
 
 ```yaml
 source-code-base-dir: /path/to/your/code
