@@ -1,5 +1,5 @@
 SHELL = /bin/bash
-VERSION ?= 0.0.1-pre5
+VERSION ?= 0.0.1
 GIT_HASH = $(shell git rev-parse --short HEAD)
 PROJECT_NAME = devon
 
