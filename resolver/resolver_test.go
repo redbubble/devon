@@ -25,7 +25,7 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	actual, err := Add(apps, app)
+	actual, err := Add(apps, app, []string{})
 
 	if err != nil {
 		t.Errorf("Error: %v\n", err)
@@ -60,7 +60,7 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	actual, err = Add(apps, appWithDependencies)
+	actual, err = Add(apps, appWithDependencies, []string{})
 
 	expectedAppNames = []string{
 		"testfenster",
@@ -94,7 +94,7 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	_, expectedErr := Add(apps, appWithCircularDependency)
+	_, expectedErr := Add(apps, appWithCircularDependency, []string{})
 
 	if expectedErr == nil {
 		t.Errorf("Expected a circular dependency to result in an error, but it didn't.")
@@ -119,9 +119,31 @@ func TestAdd(t *testing.T) {
 		},
 	}
 
-	_, expectedErr = Add(apps, conflictingApp)
+	_, expectedErr = Add(apps, conflictingApp, []string{})
 
 	if expectedErr == nil {
 		t.Errorf("Expected a conflicting dependency (same name, different mode) to result in an error, but it didn't.")
+	}
+
+	// Declines to add apps from the skip list
+	skippedApp := domain.App{
+		Name: "skipme",
+		Mode: domain.Mode{
+			Name: "dependency",
+		},
+	}
+
+	apps = []domain.App{}
+
+	skip := []string{"skipme"}
+
+	actualApps, err := Add(apps, skippedApp, skip)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(actualApps) != 0 {
+		t.Errorf("Expected an app appearing in the skip list to be skipped, but it wasn't.")
 	}
 }
