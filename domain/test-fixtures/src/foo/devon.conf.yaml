@@ -3,3 +3,4 @@ modes:
     start-command: ["bar"]
   unguessable:
     start-command: ["baz"]
+    working-dir: "fergus"

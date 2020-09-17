@@ -51,4 +51,27 @@ func TestNewApp(t *testing.T) {
 		}
 	}
 
+	// Each Mode has the correct working directory (defaulting to the App's SourceDir if unset)
+	expectedWorkingDirs := map[string]string{
+		"development": filepath.Join("test-fixtures", "src", "foo"),
+		"unguessable": filepath.Join("test-fixtures", "src", "foo", "fergus"),
+	}
+
+	a, err = NewApp("foo", "development")
+
+	if err != nil {
+		t.Errorf("NewApp returned an unexpected error: %v\n", err)
+	}
+
+	if len(a.Config.Modes) != len(expectedWorkingDirs) {
+		t.Errorf("Expected %d modes, got %d.", len(expectedWorkingDirs), len(a.Config.Modes))
+	}
+
+	for modeName, expectedDir := range expectedWorkingDirs {
+		actualDir := a.Config.Modes[modeName].WorkingDir
+
+		if expectedDir != actualDir {
+			t.Errorf("Expected working dir for '%s' mode to be '%s', but it was '%s'.", modeName, expectedDir, actualDir)
+		}
+	}
 }
