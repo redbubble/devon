@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -79,7 +80,7 @@ func (a *App) Start() error {
 		return fmt.Errorf("Don't know how to start %s in '%s' mode, because start-command is unset.", a.Name, a.Mode.Name)
 	}
 
-	return runCommand(a.Mode.StartCommand, a.Mode.WorkingDir)
+	return startTmuxWindow(a.Name, a.Mode.StartCommand, a.Mode.WorkingDir)
 }
 
 func (a *App) Stop() error {
@@ -87,6 +88,10 @@ func (a *App) Stop() error {
 	fmt.Printf("----- Stopping %s -----\n", a.Name)
 
 	if len(a.Mode.StopCommand) == 0 {
+		if a.Mode.isForeground() {
+			return nil
+		}
+
 		return fmt.Errorf("Don't know how to stop %s in '%s' mode, because stop-command is unset.", a.Name, a.Mode.Name)
 	}
 
@@ -132,6 +137,39 @@ func runCommand(command []string, workingDir string) error {
 	}
 
 	return cmd.Wait()
+}
+
+func startTmuxWindow(name string, command []string, workingDir string) error {
+	cmdString := strings.Join(command, " ")
+
+	// Set up tmux window
+	windowCmd := exec.Command("tmux", "new-window", "-c", workingDir, "-n", name)
+	err := windowCmd.Run()
+
+	if err != nil {
+		return err
+	}
+
+	if viper.IsSet("verbose") {
+		fmt.Printf("Working directory: %s\n", workingDir)
+		fmt.Printf("Command: %s\n", cmdString)
+		fmt.Println()
+	}
+
+	// If we do this with `send-keys` instead of using the command as the
+	// starting command for the container, then the tmux window will drop to
+	// a prompt when our command process finishes. That's a nicer experience
+	// than having the window disappear.
+	//
+	tmuxTarget := fmt.Sprintf("devon:%s", name)
+	appCmd := exec.Command("tmux", "send-keys", "-t", tmuxTarget, "--", cmdString, "C-m")
+	err = appCmd.Start()
+
+	if err != nil {
+		return err
+	}
+
+	return appCmd.Wait()
 }
 
 func readConfig(appName string, sourceDir string) (Config, error) {
@@ -183,6 +221,12 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 
 func defaultSourceDir(appName string) string {
 	return filepath.Join(viper.GetString("source-code-base-dir"), appName)
+}
+
+// TODO: This is an approximation at best. We may want to make this explicitly
+// configurable.
+func (m *Mode) isForeground() bool {
+	return m.Name == "development"
 }
 
 func isDirectory(path string) bool {

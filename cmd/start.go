@@ -54,6 +54,13 @@ var startCmd = &cobra.Command{
 			printAppList(apps)
 		}
 
+		// TODO: Make this display some help for tmux -- not everyone knows and loves it
+		// TODO: Consider not hard-coding the tmux session name
+		c := exec.Command("tmux", "new-session", "-d", "-s", "devon", "devon --version | less")
+		_, err = c.Output()
+
+		bail(err)
+
 		// Iterate through the list backwards. This gives the best
 		// chance (though it doesn't guarantee) that dependencies will
 		// be started before their dependents.
@@ -80,7 +87,32 @@ var startCmd = &cobra.Command{
 		if len(failedApps) > 0 {
 			fmt.Printf("Some apps failed to start:\n")
 			printAppList(failedApps)
-			os.Exit(1)
+			// os.Exit(1)
+		}
+
+		fmt.Printf("Attaching to tmux session...")
+
+		executable, err := exec.LookPath("tmux")
+		bail(err)
+
+		tmuxCmd := exec.Cmd{
+			Path: executable,
+			Args: []string{"tmux", "attach", "-t", "devon"},
+			// Dir:    workingDir,
+			Stdin:  os.Stdin,
+			Stdout: os.Stdout,
+			Stderr: os.Stderr,
+		}
+
+		err = tmuxCmd.Run()
+		bail(err)
+
+		for _, app := range startedApps {
+			err = app.Stop()
+
+			if err != nil {
+				fmt.Printf("WARNING: Could not stop %s: %v\n", app.Name, err)
+			}
 		}
 	},
 }
@@ -109,6 +141,7 @@ func getAppName(args []string) (string, error) {
 func bail(err error) {
 	if err != nil {
 		fmt.Printf("ERROR: %v\n", err)
+
 		os.Exit(1)
 	}
 }
