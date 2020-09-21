@@ -69,6 +69,10 @@ To start an app with Devon, you will need a config file called `devon.conf.yaml`
 modes:
   development:
     start-command: ["bundle", "exec", "rails", "server"]
+    # `working-dir` is the directory where `start-command` and `stop-command`
+    # should be executed. Specify it relative to the repository root.
+    # Defaults to the repository root if unspecified.
+    working-dir: app
     dependencies:
       # `name` is the name of the dependency's git repo.
       # `mode` is the name of the mode the dependency should be started in.

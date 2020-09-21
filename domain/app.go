@@ -28,6 +28,7 @@ type Mode struct {
 	Name         string
 	StartCommand []string `yaml:"start-command"`
 	StopCommand  []string `yaml:"stop-command"`
+	WorkingDir   string   `yaml:"working-dir"`
 	Dependencies []Dependency
 }
 
@@ -78,7 +79,7 @@ func (a *App) Start() error {
 		return fmt.Errorf("Don't know how to start %s in '%s' mode, because start-command is unset.", a.Name, a.Mode.Name)
 	}
 
-	return runCommand(a.Mode.StartCommand, a.SourceDir)
+	return runCommand(a.Mode.StartCommand, a.Mode.WorkingDir)
 }
 
 func (a *App) Stop() error {
@@ -89,10 +90,10 @@ func (a *App) Stop() error {
 		return fmt.Errorf("Don't know how to stop %s in '%s' mode, because stop-command is unset.", a.Name, a.Mode.Name)
 	}
 
-	return runCommand(a.Mode.StopCommand, a.SourceDir)
+	return runCommand(a.Mode.StopCommand, a.Mode.WorkingDir)
 }
 
-func runCommand(command []string, sourceDir string) error {
+func runCommand(command []string, workingDir string) error {
 
 	// In the case of tools like `make`, the executable will be on the PATH
 	// and LookPath will find it.
@@ -102,7 +103,7 @@ func runCommand(command []string, sourceDir string) error {
 	// only find that if we give it a complete path, including the
 	// application directory.
 	if err != nil {
-		executable, err = exec.LookPath(filepath.Join(sourceDir, command[0]))
+		executable, err = exec.LookPath(filepath.Join(workingDir, command[0]))
 	}
 
 	if err != nil {
@@ -112,7 +113,7 @@ func runCommand(command []string, sourceDir string) error {
 	cmd := exec.Cmd{
 		Path:   executable,
 		Args:   command,
-		Dir:    sourceDir,
+		Dir:    workingDir,
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -163,11 +164,15 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 	// Modifying properties of an object in a map is not allowed, so we have
 	// to create a whole new object and assign that to the map.
 	for name, mode := range config.Modes {
+
+		workingDir := filepath.Join(sourceDir, mode.WorkingDir)
+
 		newMode := Mode{
 			Name:         name,
 			StartCommand: mode.StartCommand,
 			StopCommand:  mode.StopCommand,
 			Dependencies: mode.Dependencies,
+			WorkingDir:   workingDir,
 		}
 
 		config.Modes[name] = newMode
