@@ -2,11 +2,12 @@ package domain
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/spf13/viper"
 )
@@ -30,12 +31,20 @@ type Mode struct {
 	StopCommand  []string `yaml:"stop-command"`
 	WorkingDir   string   `yaml:"working-dir"`
 	Dependencies []Dependency
+	Env          EnvVars
 }
 
 type Dependency struct {
 	AppName  string `yaml:"name"`
 	ModeName string `yaml:"mode"`
 }
+
+type EnvVar struct {
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
+}
+
+type EnvVars []EnvVar
 
 func NewApp(name string, modeName string) (App, error) {
 	var err error
@@ -79,7 +88,7 @@ func (a *App) Start() error {
 		return fmt.Errorf("Don't know how to start %s in '%s' mode, because start-command is unset.", a.Name, a.Mode.Name)
 	}
 
-	return runCommand(a.Mode.StartCommand, a.Mode.WorkingDir)
+	return runCommand(a.Mode.StartCommand, a.Mode.WorkingDir, a.Mode.Env)
 }
 
 func (a *App) Stop() error {
@@ -90,10 +99,20 @@ func (a *App) Stop() error {
 		return fmt.Errorf("Don't know how to stop %s in '%s' mode, because stop-command is unset.", a.Name, a.Mode.Name)
 	}
 
-	return runCommand(a.Mode.StopCommand, a.Mode.WorkingDir)
+	return runCommand(a.Mode.StopCommand, a.Mode.WorkingDir, a.Mode.Env)
 }
 
-func runCommand(command []string, workingDir string) error {
+func (env EnvVars) ToStrings() []string {
+	strings := []string{}
+
+	for _, variable := range env {
+		strings = append(strings, variable.Name+"="+variable.Value)
+	}
+
+	return strings
+}
+
+func runCommand(command []string, workingDir string, env EnvVars) error {
 
 	// In the case of tools like `make`, the executable will be on the PATH
 	// and LookPath will find it.
@@ -117,6 +136,7 @@ func runCommand(command []string, workingDir string) error {
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
+		Env:    env.ToStrings(),
 	}
 
 	if viper.IsSet("verbose") {
@@ -173,6 +193,7 @@ func readConfig(appName string, sourceDir string) (Config, error) {
 			StopCommand:  mode.StopCommand,
 			Dependencies: mode.Dependencies,
 			WorkingDir:   workingDir,
+			Env:          mode.Env,
 		}
 
 		config.Modes[name] = newMode

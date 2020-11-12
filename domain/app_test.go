@@ -74,4 +74,14 @@ func TestNewApp(t *testing.T) {
 			t.Errorf("Expected working dir for '%s' mode to be '%s', but it was '%s'.", modeName, expectedDir, actualDir)
 		}
 	}
+
+	// Modes' environment variables are read correctly
+
+	envVars := EnvVars{EnvVar{Name: "FOO", Value: "bar"}}
+	if expected, actual := envVars[0].Name, a.Mode.Env[0].Name; expected != actual {
+		t.Errorf("Expected env var Name to be %s, got %s", expected, actual)
+	}
+	if expected, actual := envVars[0].Value, a.Mode.Env[0].Value; expected != actual {
+		t.Errorf("Expected env var Value to be %s, got %s", expected, actual)
+	}
 }
