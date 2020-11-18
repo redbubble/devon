@@ -153,3 +153,20 @@ This repo is set up to use `pre-commit` to share Git pre-commit hooks. The confi
 This is to help prevent CI failures when Lucas forgets to run `go fmt` before pushing his commits. You can use it too, but you don't have to. Install with `brew install pre-commit`, then run `pre-commit install` in the root of this repo.
 
 See https://pre-commit.com for more info.
+
+### Releasing
+
+We use [Goreleaser](https://goreleaser.com/) to create releases of Devon. There are a couple of requirements for it to work:
+
+* You must have Goreleaser installed. You can get it from Homebrew.
+* You must have the `GITHUB_TOKEN` environment variable set to a [GitHub Personal Access Token](https://github.com/settings/tokens).
+
+Once you have those things in place:
+
+1. Bump the `VERSION` variable in `Makefile` in a way that fits with [Semantic Versioning](https://semver.org/).
+2. Invoke the `release` target using `make`:
+
+   ```
+   make release
+   ```
+3. Tell the world about the newly released magnificence! #eng-devon on Slack is a good place, as is #engineering. If you're especially proud, you could announce it in #released as well!
