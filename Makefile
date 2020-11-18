@@ -21,6 +21,9 @@ test:
 
 .PHONY: release
 release:
+ifeq (${GITHUB_TOKEN},)
+	$(error GITHUB_TOKEN is not set. Please populate it with your GitHub Personal Access token (https://github.com/settings/tokens))
+endif
 	git tag -f -a "v${VERSION}" -m "Releasing version ${VERSION}"
 	git push --tags
 	GO111MODULE=on goreleaser --rm-dist
