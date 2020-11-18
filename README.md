@@ -73,6 +73,10 @@ modes:
     # should be executed. Specify it relative to the repository root.
     # Defaults to the repository root if unspecified.
     working-dir: app
+    # Set any environment variables required by this mode
+    env:
+      - name: EXAMPLE_SERVICE_URL
+        value: https://example.com/
     dependencies:
       # `name` is the name of the dependency's git repo.
       # `mode` is the name of the mode the dependency should be started in.
