@@ -1,6 +1,9 @@
 modes:
   development:
     start-command: ["bar"]
+    env:
+      - name: FOO
+        value: bar
   unguessable:
     start-command: ["baz"]
     working-dir: "fergus"

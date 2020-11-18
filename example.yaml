@@ -27,8 +27,11 @@ dependencies: &default_dependencies
 #
 modes:
   development:
-    start-command: ["bash", "-c", "sleep 5; echo Starting devon!"]
+    start-command: ["bash", "-c", "sleep 5; echo Starting devon with FOO=${FOO}!"]
     working-dir: .
+    env:
+      - name: FOO
+        value: bar
     dependencies: *default_dependencies
   dependency:
     start-command: ["./dev/up.sh"]
